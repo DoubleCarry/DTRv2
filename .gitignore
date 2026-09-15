@@ -1,6 +1,20 @@
+# Dependencies
 node_modules/
 backend/node_modules/
+
+# Environment secrets
 .env
+.env.*
+!.env.example
 backend/.env
+
+# Build & runtime artifacts
 dist/
+build/
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
 

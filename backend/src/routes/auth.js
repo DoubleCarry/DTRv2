@@ -54,6 +54,20 @@ export function toUserDTO(user, activeOjt = null) {
     // Backward compatibility aliases
     goal: activeOjt ? activeOjt.targetHours : (user.settings?.dailyHours ? user.settings.dailyHours * 37.5 : 300),
     dailyHours: user.settings?.dailyHours ?? 8,
+    scheduleStart: user.settings?.scheduleStart || user.scheduleStart || '08:00',
+    scheduleEnd: user.settings?.scheduleEnd || user.scheduleEnd || '17:00',
+    lateTrackingEnabled: Boolean(user.settings?.useFixedSchedule ?? user.lateTrackingEnabled),
+    useFixedSchedule: Boolean(user.settings?.useFixedSchedule ?? user.useFixedSchedule),
+    overtimeEnabled: user.settings?.earlyArrivalCountsAsOvertime ?? user.overtimeEnabled ?? true,
+    lunchBreak: (() => {
+      const lb = user.settings?.lunchBreak || user.lunchBreak;
+      if (!lb) return { enabled: true, start: '12:00', end: '13:00' };
+      return {
+        enabled: Boolean(lb.enabled),
+        start: String(lb.start || '12:00'),
+        end: String(lb.end || '13:00'),
+      };
+    })(),
   };
 }
 

@@ -16,7 +16,7 @@ import {
   handleImportFileSelect,
   setTodayDate, toggleEntryAbsent, setMeridiem, setEditMeridiem, updateEditOvertimePreview, updateExportTemplateUI, addExportAdditionalInfoRow,
   openOjtModal, handleCreateOJT, handleActivateOJT,
-  updateConfigAccessibility,
+  updateConfigAccessibility, fillMinuteSelect,
 } from './userDashboard.js';
 import { renderAdminDashboard, showUserDetail, adminBackToOverview, openAddUserModal, handleAddUser, openEditUserGoal, saveEditUserGoal, adminDeleteUser, adminExportCSV, adminExportPrint, openAdminResetPasswordModal, adminResetUserPassword } from './adminDashboard.js';
 import { apiLogin, apiSignup, apiMe, hasApiToken, setApiToken } from './api.js';
@@ -30,6 +30,12 @@ applyTheme(localStorage.getItem(THEME_KEY) || 'light');
 applyColorTheme(localStorage.getItem('dtr_color_theme') || 'sky', false);
 initModalOverlayClose();
 initConfirmDialog();
+[
+  'entryInMinute', 'entryOutMinute',
+  'editInMinute', 'editOutMinute',
+  'scheduleStartMinute', 'scheduleEndMinute',
+  'lunchStartMinute', 'lunchEndMinute',
+].forEach(fillMinuteSelect);
 
 function fillDemo(username, password) {
   switchAuthMode('login');

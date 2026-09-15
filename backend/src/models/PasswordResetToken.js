@@ -4,7 +4,7 @@ import { InMemoryPasswordResetToken } from './inMemoryStore.js';
 const PasswordResetTokenSchema = new mongoose.Schema(
   {
     userId: { type: mongoose.Schema.Types.Mixed, required: true, index: true },
-    token: { type: String, required: true, unique: true, index: true },
+    token: { type: String, required: true, unique: true },
     expiresAt: { type: Date, required: true },
     used: { type: Boolean, default: false },
   },

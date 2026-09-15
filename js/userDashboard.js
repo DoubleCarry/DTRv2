@@ -61,7 +61,15 @@ function currentUserFresh() {
 }
 
 function getLunchCfg(user) {
-  return user?.lunchBreak || { enabled: false, start: '11:20', end: '12:20' };
+  const cfg = user?.settings?.lunchBreak || user?.lunchBreak;
+  if (cfg) {
+    return {
+      enabled: cfg.enabled !== false,
+      start: cfg.start || '12:00',
+      end: cfg.end || '13:00',
+    };
+  }
+  return { enabled: true, start: '12:00', end: '13:00' };
 }
 
 function overtimeEnabled(user) {
@@ -69,23 +77,23 @@ function overtimeEnabled(user) {
 }
 
 function lateTrackingEnabled(user) {
-  return user?.lateTrackingEnabled === true;
+  return user?.settings?.useFixedSchedule === true || user?.lateTrackingEnabled === true || user?.useFixedSchedule === true;
 }
 
 function workSchedule(user) {
   return {
-    start: user?.scheduleStart || '08:00',
-    end: user?.scheduleEnd || '17:00',
+    start: user?.settings?.scheduleStart || user?.scheduleStart || '08:00',
+    end: user?.settings?.scheduleEnd || user?.scheduleEnd || '17:00',
   };
 }
 
 function getUserSettings(user) {
   return {
-    dailyHours: user?.dailyHours || 8,
-    useFixedSchedule: user?.lateTrackingEnabled || user?.useFixedSchedule || false,
-    scheduleStart: user?.scheduleStart || '08:00',
-    scheduleEnd: user?.scheduleEnd || '17:00',
-    earlyArrivalCountsAsOvertime: user?.earlyArrivalCountsAsOvertime || false,
+    dailyHours: user?.settings?.dailyHours || user?.dailyHours || 8,
+    useFixedSchedule: lateTrackingEnabled(user),
+    scheduleStart: user?.settings?.scheduleStart || user?.scheduleStart || '08:00',
+    scheduleEnd: user?.settings?.scheduleEnd || user?.scheduleEnd || '17:00',
+    earlyArrivalCountsAsOvertime: user?.settings?.earlyArrivalCountsAsOvertime ?? user?.earlyArrivalCountsAsOvertime ?? false,
     lunchBreak: getLunchCfg(user),
   };
 }
@@ -305,7 +313,7 @@ function readEditTimes() {
   return { timeIn, timeOut };
 }
 
-function fillMinuteSelect(id) {
+export function fillMinuteSelect(id) {
   const el = document.getElementById(id);
   if (!el || el.options.length) return;
   const html = [];
@@ -316,7 +324,7 @@ function fillMinuteSelect(id) {
   el.innerHTML = html.join('');
 }
 
-function addWheelBehavior(id, onChange) {
+export function addWheelBehavior(id, onChange) {
   const el = document.getElementById(id);
   if (!el || el.dataset.wheelBound === '1') return;
   el.dataset.wheelBound = '1';
@@ -371,10 +379,11 @@ export function initUserDashboard() {
   if (absentEl) absentEl.checked = false;
   setEntryAbsentUI(false);
 
-  syncPickerFromTime('entryIn', '08:00', { hour: '08', minute: '00', meridiem: 'AM' });
-  syncPickerFromTime('entryOut', '17:00', { hour: '05', minute: '00', meridiem: 'PM' });
-  setNativeTime('entryIn', '08:00');
-  setNativeTime('entryOut', '17:00');
+  const sched = workSchedule(user);
+  syncPickerFromTime('entryIn', sched.start || '08:00');
+  syncPickerFromTime('entryOut', sched.end || '17:00');
+  setNativeTime('entryIn', sched.start || '08:00');
+  setNativeTime('entryOut', sched.end || '17:00');
 
   wirePicker('entryIn', updateEntryPreview);
   wirePicker('entryOut', updateEntryPreview);
@@ -697,8 +706,12 @@ export function handleAddEntry() {
   const absentEl = document.getElementById('entryAbsent');
   if (absentEl) absentEl.checked = false;
   setEntryAbsentUI(false);
-  syncPickerFromTime('entryIn', '08:00', { hour: '08', minute: '00', meridiem: 'AM' });
-  syncPickerFromTime('entryOut', '17:00', { hour: '05', minute: '00', meridiem: 'PM' });
+  const freshUser = currentUserFresh();
+  const sched = workSchedule(freshUser);
+  syncPickerFromTime('entryIn', sched.start || '08:00');
+  syncPickerFromTime('entryOut', sched.end || '17:00');
+  setNativeTime('entryIn', sched.start || '08:00');
+  setNativeTime('entryOut', sched.end || '17:00');
   updateEntryPreview();
   refresh();
 }
@@ -880,6 +893,21 @@ export function updateConfigAccessibility() {
 
 export function openSettings() {
   const user = currentUserFresh();
+  if (!user) return;
+
+  // Always ensure minute pickers are populated
+  [
+    'scheduleStartMinute', 'scheduleEndMinute',
+    'lunchStartMinute', 'lunchEndMinute',
+  ].forEach(fillMinuteSelect);
+
+  [
+    'scheduleStartHour', 'scheduleStartMinute', 'scheduleStartMeridiem',
+    'scheduleEndHour', 'scheduleEndMinute', 'scheduleEndMeridiem',
+    'lunchStartHour', 'lunchStartMinute', 'lunchStartMeridiem',
+    'lunchEndHour', 'lunchEndMinute', 'lunchEndMeridiem',
+  ].forEach(id => addWheelBehavior(id));
+
   setVal('settingGoal', user.goal || 300);
   setVal('settingTargetDate', user.targetDate || '');
   setVal('settingDaily', user.dailyHours || 8);
@@ -894,9 +922,9 @@ export function openSettings() {
   syncPickerFromTime('scheduleEnd', sched.end, { hour: '05', minute: '00', meridiem: 'PM' });
   const lunch = getLunchCfg(user);
   const lunchEnabled = document.getElementById('settingLunchEnabled');
-  if (lunchEnabled) lunchEnabled.checked = !!lunch.enabled;
-  syncPickerFromTime('lunchStart', lunch.start || '11:20', { hour: '11', minute: '20', meridiem: 'AM' });
-  syncPickerFromTime('lunchEnd', lunch.end || '12:20', { hour: '12', minute: '20', meridiem: 'PM' });
+  if (lunchEnabled) lunchEnabled.checked = lunch.enabled === true;
+  syncPickerFromTime('lunchStart', lunch.start || '12:00', { hour: '12', minute: '00', meridiem: 'PM' });
+  syncPickerFromTime('lunchEnd', lunch.end || '13:00', { hour: '01', minute: '00', meridiem: 'PM' });
   setVal('settingHolidayAdd', (holidayOverrides(user).add || []).join('\n'));
   setVal('settingHolidayRemove', (holidayOverrides(user).remove || []).join('\n'));
   setVal('settingCurrentPassword', '');
@@ -918,11 +946,11 @@ export function saveSettings() {
   const username = val('settingUsername').trim().toLowerCase();
   const overtimeOn = document.getElementById('settingOvertimeEnabled')?.checked ?? true;
   const lateOn = document.getElementById('settingLateEnabled')?.checked ?? false;
-  const scheduleStart = buildTimeFromPicker('scheduleStart');
-  const scheduleEnd = buildTimeFromPicker('scheduleEnd');
-  const lunchEnabled = document.getElementById('settingLunchEnabled')?.checked || false;
-  const lunchStart = buildTimeFromPicker('lunchStart');
-  const lunchEnd = buildTimeFromPicker('lunchEnd');
+  const scheduleStart = buildTimeFromPicker('scheduleStart') || '08:00';
+  const scheduleEnd = buildTimeFromPicker('scheduleEnd') || '17:00';
+  const lunchEnabled = Boolean(document.getElementById('settingLunchEnabled')?.checked);
+  let lunchStart = buildTimeFromPicker('lunchStart') || '12:00';
+  let lunchEnd = buildTimeFromPicker('lunchEnd') || '13:00';
   const holidayAdd = parseDateList(val('settingHolidayAdd'));
   const holidayRemove = parseDateList(val('settingHolidayRemove'));
   const currentPass = val('settingCurrentPassword');
@@ -938,8 +966,12 @@ export function saveSettings() {
     return;
   }
   if (lunchEnabled && (!lunchStart || !lunchEnd || timeToMins(lunchEnd) <= timeToMins(lunchStart))) {
-    toast('Lunch window must have a valid start and end time.', 'error');
-    return;
+    const sM = timeToMins(lunchStart || '12:00');
+    const eM = (sM + 60) % 1440;
+    const h24 = Math.floor(eM / 60);
+    const mm = eM % 60;
+    lunchEnd = `${String(h24).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
+    syncPickerFromTime('lunchEnd', lunchEnd);
   }
 
   const user = getCurrentUser();
@@ -950,6 +982,12 @@ export function saveSettings() {
     if (newPass !== confirmPass) { toast('New passwords do not match.', 'error'); return; }
   }
 
+  const lunchBreakConfig = {
+    enabled: lunchEnabled,
+    start: lunchStart,
+    end: lunchEnd,
+  };
+
   const updated = {
     ...fresh,
     goal,
@@ -957,6 +995,7 @@ export function saveSettings() {
     dailyHours: daily,
     overtimeEnabled: overtimeOn,
     lateTrackingEnabled: lateOn,
+    useFixedSchedule: lateOn,
     scheduleStart,
     scheduleEnd,
     manualHolidaysAdd: holidayAdd,
@@ -965,20 +1004,31 @@ export function saveSettings() {
     username,
     password: newPass ? newPass : fresh.password,
     colorTheme: getColorTheme(),
-    lunchBreak: {
-      enabled: lunchEnabled,
-      start: lunchStart || '11:20',
-      end: lunchEnd || '12:20',
+    lunchBreak: lunchBreakConfig,
+    settings: {
+      ...(fresh.settings || {}),
+      dailyHours: daily,
+      useFixedSchedule: lateOn,
+      scheduleStart,
+      scheduleEnd,
+      lunchBreak: lunchBreakConfig,
     },
   };
 
   let activeUser = updated;
-  if (username !== fresh.id) {
+  const currentUsername = fresh.username || fresh.id;
+  if (username !== currentUsername) {
     const users = getUsers();
-    if (users[username]) { toast('That username is already taken.', 'error'); return; }
+    const isTaken = Object.values(users).some(u => 
+      (u.username === username || u.id === username) && u.id !== fresh.id && u._id !== fresh.id
+    );
+    if (isTaken) { toast('That username is already taken.', 'error'); return; }
     const migrated = migrateUserId(fresh.id, username);
-    if (!migrated) { toast('Failed to change username.', 'error'); return; }
-    activeUser = { ...updated, id: username, username };
+    if (!migrated) {
+      activeUser = { ...updated, username };
+    } else {
+      activeUser = { ...updated, id: username, username };
+    }
   }
 
   saveUser(activeUser);
@@ -991,6 +1041,7 @@ export function saveSettings() {
     dailyHours: activeUser.dailyHours,
     overtimeEnabled: activeUser.overtimeEnabled,
     lateTrackingEnabled: activeUser.lateTrackingEnabled,
+    useFixedSchedule: activeUser.lateTrackingEnabled,
     scheduleStart: activeUser.scheduleStart,
     scheduleEnd: activeUser.scheduleEnd,
     lunchBreak: activeUser.lunchBreak,
@@ -1002,15 +1053,41 @@ export function saveSettings() {
     confirmPassword: confirmPass || undefined,
   };
   apiUpdateSettings(apiPayload).then(({ user: apiUser }) => {
-    saveUser(apiUser);
-    setCurrentUser(apiUser);
-    setTopbarUser(apiUser);
-    setText('userGreetName', firstName(apiUser.name));
-    refresh();
-  }).catch(() => {});
+    if (apiUser) {
+      if (!apiUser.lunchBreak && activeUser.lunchBreak) {
+        apiUser.lunchBreak = activeUser.lunchBreak;
+      }
+      if (!apiUser.settings) apiUser.settings = {};
+      if (!apiUser.settings.lunchBreak && activeUser.lunchBreak) {
+        apiUser.settings.lunchBreak = activeUser.lunchBreak;
+      }
+      saveUser(apiUser);
+      setCurrentUser(apiUser);
+      setTopbarUser(apiUser);
+      setText('userGreetName', firstName(apiUser.name));
+      const savedSched = workSchedule(apiUser);
+      syncPickerFromTime('entryIn', savedSched.start || '08:00');
+      syncPickerFromTime('entryOut', savedSched.end || '17:00');
+      setNativeTime('entryIn', savedSched.start || '08:00');
+      setNativeTime('entryOut', savedSched.end || '17:00');
+      updateEntryPreview();
+      recalcAllSessions(apiUser);
+      refresh();
+    }
+  }).catch((err) => {
+    console.warn('apiUpdateSettings fallback:', err);
+  });
   recalcAllSessions(activeUser);
   setTopbarUser(activeUser);
   setText('userGreetName', firstName(activeUser.name));
+
+  // Also update entry pickers immediately with the new schedule
+  const savedSched = workSchedule(activeUser);
+  syncPickerFromTime('entryIn', savedSched.start || '08:00');
+  syncPickerFromTime('entryOut', savedSched.end || '17:00');
+  setNativeTime('entryIn', savedSched.start || '08:00');
+  setNativeTime('entryOut', savedSched.end || '17:00');
+  updateEntryPreview();
 
   closeModal('settingsModal');
   toast('Settings saved.', 'success');

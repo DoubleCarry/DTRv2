@@ -21,7 +21,7 @@ export async function connectDB(uri) {
   try {
     await mongoose.connect(uri, {
       autoIndex: true,
-      serverSelectionTimeoutMS: 2500,
+      serverSelectionTimeoutMS: 10000,
     });
     console.log('[AI Studio] Connected to MongoDB');
     return true;

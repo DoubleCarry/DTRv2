@@ -4,7 +4,7 @@ import { InMemoryUser } from './inMemoryStore.js';
 const UserSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
-    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    email: { type: String, trim: true, lowercase: true, default: '' },
     username: { type: String, required: true, unique: true, lowercase: true, trim: true },
     passwordHash: { type: String, required: true },
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
@@ -15,6 +15,16 @@ const UserSchema = new mongoose.Schema(
     department: { type: String, default: '', trim: true },
     supervisor: { type: String, default: '', trim: true },
     isEmailVerified: { type: Boolean, default: false },
+    dailyHours: { type: Number, default: 8 },
+    useFixedSchedule: { type: Boolean, default: false },
+    lateTrackingEnabled: { type: Boolean, default: false },
+    scheduleStart: { type: String, default: '08:00' },
+    scheduleEnd: { type: String, default: '17:00' },
+    lunchBreak: {
+      enabled: { type: Boolean, default: true },
+      start: { type: String, default: '12:00' },
+      end: { type: String, default: '13:00' },
+    },
     settings: {
       dailyHours: { type: Number, default: 8, min: 1, max: 24 },
       useFixedSchedule: { type: Boolean, default: false },
@@ -37,8 +47,7 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-UserSchema.index({ username: 1 }, { unique: true });
-UserSchema.index({ email: 1 }, { unique: true });
+
 
 export const MongoUser = mongoose.model('User', UserSchema);
 

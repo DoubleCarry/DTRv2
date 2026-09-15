@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node backend/src/server.js",
+    "dev": "node --watch backend/src/server.js",
     "start": "node backend/src/server.js",
     "build": "echo 'No build required for static frontend'",
     "lint": "node -c backend/src/server.js js/*.js tests/calcEngine.test.js",

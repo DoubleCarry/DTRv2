@@ -85,13 +85,17 @@ router.put('/me/settings', async (req, res) => {
     const body = req.body || {};
     const currentSettings = req.user.settings || {};
 
+    const fixedSched = body.useFixedSchedule !== undefined 
+      ? Boolean(body.useFixedSchedule) 
+      : (body.lateTrackingEnabled !== undefined ? Boolean(body.lateTrackingEnabled) : currentSettings.useFixedSchedule);
+
     const newSettings = {
       ...currentSettings,
       dailyHours: body.dailyHours !== undefined ? Number(body.dailyHours) : currentSettings.dailyHours,
-      useFixedSchedule: body.useFixedSchedule !== undefined ? Boolean(body.useFixedSchedule) : currentSettings.useFixedSchedule,
+      useFixedSchedule: Boolean(fixedSched),
       scheduleMode: body.scheduleMode || currentSettings.scheduleMode || 'simple',
-      scheduleStart: body.scheduleStart !== undefined ? String(body.scheduleStart) : currentSettings.scheduleStart,
-      scheduleEnd: body.scheduleEnd !== undefined ? String(body.scheduleEnd) : currentSettings.scheduleEnd,
+      scheduleStart: body.scheduleStart !== undefined ? String(body.scheduleStart) : (currentSettings.scheduleStart || '08:00'),
+      scheduleEnd: body.scheduleEnd !== undefined ? String(body.scheduleEnd) : (currentSettings.scheduleEnd || '17:00'),
       earlyArrivalCountsAsOvertime: body.earlyArrivalCountsAsOvertime !== undefined ? Boolean(body.earlyArrivalCountsAsOvertime) : currentSettings.earlyArrivalCountsAsOvertime,
       workingDays: Array.isArray(body.workingDays) ? body.workingDays : currentSettings.workingDays,
       lunchBreak: body.lunchBreak ? {
@@ -105,9 +109,25 @@ router.put('/me/settings', async (req, res) => {
       signatureData: body.signatureData !== undefined ? String(body.signatureData) : currentSettings.signatureData,
     };
 
-    const userUpdate = { settings: newSettings };
+    const userUpdate = {
+      settings: newSettings,
+      scheduleStart: newSettings.scheduleStart,
+      scheduleEnd: newSettings.scheduleEnd,
+      dailyHours: newSettings.dailyHours,
+      useFixedSchedule: newSettings.useFixedSchedule,
+      lateTrackingEnabled: newSettings.useFixedSchedule,
+      lunchBreak: newSettings.lunchBreak,
+    };
     if (body.name && String(body.name).trim()) {
       userUpdate.name = String(body.name).trim();
+    }
+    if (body.username && String(body.username).trim().toLowerCase() !== req.user.username) {
+      const cleanU = String(body.username).trim().toLowerCase();
+      const existingU = await User.findOne({ username: cleanU, _id: { $ne: req.user._id } });
+      if (existingU) {
+        return res.status(409).json({ error: 'That username is already taken.' });
+      }
+      userUpdate.username = cleanU;
     }
 
     const updated = await User.findByIdAndUpdate(

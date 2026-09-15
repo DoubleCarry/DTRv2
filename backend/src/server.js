@@ -70,6 +70,7 @@ async function ensureAdminSeed() {
       await User.create({
         username: adminUser,
         name: adminName,
+        email: `${adminUser}@dtr.local`,
         passwordHash: hash,
         role: 'admin',
         goal: 300,
@@ -80,12 +81,52 @@ async function ensureAdminSeed() {
       console.log(`Admin seeded: ${adminUser}`);
       return;
     }
-    if (existing.role !== 'admin') {
-      await User.updateOne({ _id: existing._id }, { role: 'admin', passwordHash: hash, name: adminName });
-      console.log(`Admin promoted: ${adminUser}`);
-    }
+    await User.updateOne(
+      { _id: existing._id },
+      {
+        role: 'admin',
+        passwordHash: hash,
+        name: adminName,
+        email: existing.email || `${adminUser}@dtr.local`,
+      }
+    );
+    console.log(`Admin account synced with .env: ${adminUser}`);
   } catch (e) {
     console.warn('Failed to seed admin in MongoDB:', e.message);
+  }
+}
+
+async function ensureDemoUserSeed() {
+  try {
+    const existing = await User.findOne({ username: 'john' });
+    if (!existing) {
+      const hash = await bcrypt.hash('pass123', 10);
+      const user = await User.create({
+        username: 'john',
+        name: 'John Reyes',
+        email: 'john@dtr.local',
+        passwordHash: hash,
+        role: 'user',
+        studentId: '2026-00142',
+        school: 'Polytechnic University',
+        course: 'BS Information Technology',
+        company: 'CloudTech Solutions',
+        department: 'Software Engineering',
+        supervisor: 'Engr. Santos',
+        isEmailVerified: true,
+      });
+      const { OJTRequirement } = await import('./models/OJTRequirement.js');
+      await OJTRequirement.create({
+        userId: user._id,
+        name: 'OJT 1 - Practicum Internship',
+        targetHours: 300,
+        startDate: new Date().toISOString().slice(0, 10),
+        status: 'ACTIVE',
+      });
+      console.log('Demo user seeded: john');
+    }
+  } catch (e) {
+    console.warn('Failed to seed demo user:', e.message);
   }
 }
 
@@ -97,6 +138,7 @@ connectDB(process.env.MONGODB_URI)
   .then(async (connected) => {
     if (connected) {
       await ensureAdminSeed();
+      await ensureDemoUserSeed();
     }
   })
   .catch((err) => {

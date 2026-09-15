@@ -60,10 +60,13 @@ export async function apiLogin(identifier, password) {
   });
 }
 
-export async function apiSignup(userData) {
+export async function apiSignup(userDataOrName, username, password) {
+  const payload = typeof userDataOrName === 'object' && userDataOrName !== null
+    ? userDataOrName
+    : { name: userDataOrName, username, password };
   return request('/auth/signup', {
     method: 'POST',
-    body: JSON.stringify(userData),
+    body: JSON.stringify(payload),
   });
 }
 
