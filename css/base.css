@@ -1,0 +1,344 @@
+/* ═══════════════════════════════════════════════
+   DTR — BASE STYLES & TYPOGRAPHY
+   Refined, architectural, accessible design tokens
+   ═══════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Dark Theme Palette (Obsidian & Deep Slate) */
+  --bg:          #0b0f19;
+  --bg2:         #111827;
+  --bg3:         #1f2937;
+  --card:        #111827;
+  --card2:       #182234;
+
+  /* Crisp Hairline Borders */
+  --border:      rgba(255, 255, 255, 0.08);
+  --border2:     rgba(255, 255, 255, 0.14);
+  --border3:     rgba(255, 255, 255, 0.22);
+
+  /* Curated Jewel Accents (Non-neon) */
+  --accent:      #38bdf8;
+  --accent-hover:#0ea5e9;
+  --accent2:     #60a5fa;
+  --accent3:     #f87171;
+  --accent4:     #fbbf24;
+  --accent5:     #c084fc;
+  --success:     #34d399;
+  --warning:     #fbbf24;
+  --danger:      #f87171;
+  --info:        #38bdf8;
+  --overtime:    #c084fc;
+
+  /* Typography Colors */
+  --text:        #f9fafb;
+  --text2:       #9ca3af;
+  --text3:       #6b7280;
+
+  /* Proportional Radii */
+  --radius:      14px;
+  --radius-sm:   8px;
+  --radius-lg:   18px;
+
+  /* Subtle Optical Shadows */
+  --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow:      0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --shadow-glow: none;
+}
+
+/* Light Theme (Crisp Architectural Slate & Indigo - Primary Default) */
+body.light-theme {
+  --bg:          #f8fafc;
+  --bg2:         #f1f5f9;
+  --bg3:         #e2e8f0;
+  --card:        #ffffff;
+  --card2:       #f8fafc;
+
+  --border:      #e2e8f0;
+  --border2:     #cbd5e1;
+  --border3:     #94a3b8;
+
+  --accent:      #0284c7;
+  --accent-hover:#0369a1;
+  --accent2:     #2563eb;
+  --accent3:     #dc2626;
+  --accent4:     #d97706;
+  --accent5:     #7c3aed;
+  --success:     #059669;
+  --warning:     #d97706;
+  --danger:      #dc2626;
+  --info:        #0284c7;
+  --overtime:    #7c3aed;
+
+  --text:        #0f172a;
+  --text2:       #475569;
+  --text3:       #64748b;
+
+  --shadow-sm:   0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow:      0 4px 14px rgba(15, 23, 42, 0.06);
+  --shadow-card: 0 2px 12px rgba(15, 23, 42, 0.05);
+  --shadow-glow: none;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PRE-SELECTED COLOR TEMPLATES (Light & Dark for each)
+   1. sky:      Classic Sky / Ocean Slate (Default)
+   2. emerald:  Emerald Sage (Focused & Balanced)
+   3. amethyst: Royal Amethyst (Creative & Refined)
+   4. amber:    Sunset Amber (Warm & Energetic)
+   5. rose:     Rose Crimson (Bold & Vibrant)
+   6. titanium: Titanium Noir (Architectural & Minimalist)
+   ══════════════════════════════════════════════════════════════════ */
+
+/* 1. Emerald Sage */
+body[data-color-theme="emerald"].light-theme {
+  --accent:       #059669;
+  --accent-hover: #047857;
+  --accent2:      #0d9488;
+  --accent5:      #10b981;
+  --bg:           #f5fbf7;
+  --bg2:          #ecfdf5;
+  --bg3:          #d1fae5;
+  --card:         #ffffff;
+  --card2:        #f5fbf7;
+  --border:       #e2ede6;
+  --border2:      #c4ded0;
+  --border3:      #86bca0;
+}
+body[data-color-theme="emerald"]:not(.light-theme) {
+  --accent:       #34d399;
+  --accent-hover: #10b981;
+  --accent2:      #2dd4bf;
+  --accent5:      #6ee7b7;
+  --bg:           #061510;
+  --bg2:          #0c231b;
+  --bg3:          #133529;
+  --card:         #0c231b;
+  --card2:        #102d24;
+  --border:       rgba(52, 211, 153, 0.14);
+  --border2:      rgba(52, 211, 153, 0.24);
+  --border3:      rgba(52, 211, 153, 0.38);
+}
+
+/* 2. Royal Amethyst */
+body[data-color-theme="amethyst"].light-theme {
+  --accent:       #7c3aed;
+  --accent-hover: #6d28d9;
+  --accent2:      #6366f1;
+  --accent5:      #8b5cf6;
+  --bg:           #faf7fd;
+  --bg2:          #f3e8ff;
+  --bg3:          #e9d5ff;
+  --card:         #ffffff;
+  --card2:        #faf7fd;
+  --border:       #ede4f7;
+  --border2:      #ddd0f1;
+  --border3:      #baa2df;
+}
+body[data-color-theme="amethyst"]:not(.light-theme) {
+  --accent:       #c084fc;
+  --accent-hover: #a855f7;
+  --accent2:      #818cf8;
+  --accent5:      #d8b4fe;
+  --bg:           #0e0a19;
+  --bg2:          #161027;
+  --bg3:          #221a3b;
+  --card:         #161027;
+  --card2:        #1e1635;
+  --border:       rgba(192, 132, 252, 0.14);
+  --border2:      rgba(192, 132, 252, 0.24);
+  --border3:      rgba(192, 132, 252, 0.38);
+}
+
+/* 3. Sunset Amber */
+body[data-color-theme="amber"].light-theme {
+  --accent:       #d97706;
+  --accent-hover: #b45309;
+  --accent2:      #ea580c;
+  --accent5:      #f59e0b;
+  --bg:           #fffbf2;
+  --bg2:          #fef3c7;
+  --bg3:          #fde68a;
+  --card:         #ffffff;
+  --card2:        #fffbf2;
+  --border:       #faebd2;
+  --border2:      #f1d7ab;
+  --border3:      #d8af6e;
+}
+body[data-color-theme="amber"]:not(.light-theme) {
+  --accent:       #fbbf24;
+  --accent-hover: #f59e0b;
+  --accent2:      #fb923c;
+  --accent5:      #fde047;
+  --bg:           #171107;
+  --bg2:          #241a0b;
+  --bg3:          #382912;
+  --card:         #241a0b;
+  --card2:        #30230f;
+  --border:       rgba(251, 191, 36, 0.14);
+  --border2:      rgba(251, 191, 36, 0.24);
+  --border3:      rgba(251, 191, 36, 0.38);
+}
+
+/* 4. Rose Crimson */
+body[data-color-theme="rose"].light-theme {
+  --accent:       #e11d48;
+  --accent-hover: #be123c;
+  --accent2:      #db2777;
+  --accent5:      #f43f5e;
+  --bg:           #fff5f6;
+  --bg2:          #ffe4e6;
+  --bg3:          #fecdd3;
+  --card:         #ffffff;
+  --card2:        #fff5f6;
+  --border:       #fce1e4;
+  --border2:      #f7c5cb;
+  --border3:      #e9949f;
+}
+body[data-color-theme="rose"]:not(.light-theme) {
+  --accent:       #fb7185;
+  --accent-hover: #f43f5e;
+  --accent2:      #f472b6;
+  --accent5:      #fda4af;
+  --bg:           #18090e;
+  --bg2:          #270f17;
+  --bg3:          #3b1723;
+  --card:         #270f17;
+  --card2:        #33141f;
+  --border:       rgba(251, 113, 133, 0.14);
+  --border2:      rgba(251, 113, 133, 0.24);
+  --border3:      rgba(251, 113, 133, 0.38);
+}
+
+/* 5. Titanium Noir */
+body[data-color-theme="titanium"].light-theme {
+  --accent:       #334155;
+  --accent-hover: #1e293b;
+  --accent2:      #475569;
+  --accent5:      #64748b;
+  --bg:           #f8fafc;
+  --bg2:          #f1f5f9;
+  --bg3:          #e2e8f0;
+  --card:         #ffffff;
+  --card2:        #f8fafc;
+  --border:       #cbd5e1;
+  --border2:      #94a3b8;
+  --border3:      #64748b;
+}
+body[data-color-theme="titanium"]:not(.light-theme) {
+  --accent:       #94a3b8;
+  --accent-hover: #cbd5e1;
+  --accent2:      #64748b;
+  --accent5:      #e2e8f0;
+  --bg:           #09090b;
+  --bg2:          #121215;
+  --bg3:          #1e1e24;
+  --card:         #121215;
+  --card2:        #18181d;
+  --border:       rgba(255, 255, 255, 0.10);
+  --border2:      rgba(255, 255, 255, 0.18);
+  --border3:      rgba(255, 255, 255, 0.28);
+}
+
+/* 6. Classic Sky (explicit attribute for completeness) */
+body[data-color-theme="sky"].light-theme {
+  --accent:       #0284c7;
+  --accent-hover: #0369a1;
+  --accent2:      #2563eb;
+  --accent5:      #7c3aed;
+  --bg:           #f8fafc;
+  --bg2:          #f1f5f9;
+  --bg3:          #e2e8f0;
+  --card:         #ffffff;
+  --card2:        #f8fafc;
+  --border:       #e2e8f0;
+  --border2:      #cbd5e1;
+  --border3:      #94a3b8;
+}
+body[data-color-theme="sky"]:not(.light-theme) {
+  --accent:       #38bdf8;
+  --accent-hover: #0ea5e9;
+  --accent2:      #60a5fa;
+  --accent5:      #c084fc;
+  --bg:           #0b0f19;
+  --bg2:          #111827;
+  --bg3:          #1f2937;
+  --card:         #111827;
+  --card2:        #182234;
+  --border:       rgba(255, 255, 255, 0.08);
+  --border2:      rgba(255, 255, 255, 0.14);
+  --border3:      rgba(255, 255, 255, 0.22);
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Subtle architectural dot grid background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(rgba(100, 116, 139, 0.12) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+body.light-theme::before {
+  background-image: radial-gradient(rgba(148, 163, 184, 0.22) 1px, transparent 1px);
+  opacity: 0.7;
+}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar          { width: 6px; height: 6px; }
+::-webkit-scrollbar-track    { background: transparent; }
+::-webkit-scrollbar-thumb    { background: var(--border2); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+/* ─── TYPOGRAPHY ─── */
+.mono {
+  font-family: 'JetBrains Mono', 'DM Mono', monospace;
+  font-feature-settings: 'tnum';
+  font-variant-numeric: tabular-nums;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--text);
+}
+
+p {
+  color: var(--text2);
+}
+
+/* ─── UTILITIES ─── */
+.hidden   { display: none !important; }
+.sr-only  { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+.rel      { position: relative; z-index: 1; }
+.w-full   { width: 100%; }
