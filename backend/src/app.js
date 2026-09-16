@@ -1,4 +1,7 @@
 import 'dotenv/config';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import express from 'express';
 import cors from 'cors';
 import { connectDB } from './config/db.js';
@@ -11,6 +14,9 @@ import holidayRoutes from './routes/holidays.js';
 import { User } from './models/User.js';
 import { seedInMemoryStore } from './models/inMemoryStore.js';
 import bcrypt from 'bcryptjs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -167,7 +173,32 @@ app.use('/api/dtr', dtrRoutes);
 app.use('/api/ojt', ojtRoutes);
 app.use('/api/holidays', holidayRoutes);
 
-// Database offline error middleware fallback
+// Serve frontend static assets from candidate directories
+const candidateDirs = [
+  process.cwd(),
+  path.resolve(__dirname, '../../'),
+];
+
+for (const dir of candidateDirs) {
+  if (fs.existsSync(path.join(dir, 'index.html'))) {
+    app.use(express.static(dir));
+  }
+}
+
+// SPA fallback for non-API routes (safe with fs.existsSync)
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) return next();
+
+  for (const dir of candidateDirs) {
+    const p = path.join(dir, 'index.html');
+    if (fs.existsSync(p)) {
+      return res.sendFile(p);
+    }
+  }
+  return res.status(404).send('Not Found');
+});
+
+// Database offline error middleware fallback & global error handler (MUST be last)
 app.use((err, req, res, _next) => {
   if (err.name === 'MongooseError' || err.name === 'MongoNetworkError' || err.message?.includes('buffering timed out')) {
     console.log('[AI Studio] Database offline — handling request via fallback');
@@ -176,17 +207,9 @@ app.use((err, req, res, _next) => {
     }
     return res.status(503).json({ error: 'Service temporarily unavailable (database offline)' });
   }
-  console.error(err);
-  res.status(500).json({ error: 'Internal server error' });
-});
-
-// Serve frontend static assets and SPA fallback
-const rootDir = process.cwd();
-app.use(express.static(rootDir));
-
-app.get('*', (req, res, next) => {
-  if (req.path.startsWith('/api')) return next();
-  res.sendFile(path.join(rootDir, 'index.html'));
+  console.error('[App Error]', err);
+  if (res.headersSent) return;
+  res.status(500).json({ error: err.message || 'Internal server error' });
 });
 
 export { app };
