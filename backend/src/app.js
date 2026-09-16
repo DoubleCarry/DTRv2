@@ -180,5 +180,14 @@ app.use((err, req, res, _next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
+// Serve frontend static assets and SPA fallback
+const rootDir = process.cwd();
+app.use(express.static(rootDir));
+
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) return next();
+  res.sendFile(path.join(rootDir, 'index.html'));
+});
+
 export { app };
 export default app;
