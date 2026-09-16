@@ -75,6 +75,7 @@ router.get('/', async (req, res) => {
 
     return res.json({
       records,
+      sessions: records,
       totals,
       forecast,
       ojt: currentOjt,
@@ -162,7 +163,7 @@ router.post('/', async (req, res) => {
       },
     });
 
-    return res.status(201).json({ record: created });
+    return res.status(201).json({ record: created, session: created });
   } catch (err) {
     console.error('Create DTR error:', err);
     return res.status(500).json({ error: 'Unable to save DTR entry. Please check your connection and try again.' });
@@ -388,7 +389,7 @@ router.put('/:id', async (req, res) => {
       details: { recordId: req.params.id, updates: update },
     });
 
-    return res.json({ record: updated });
+    return res.json({ record: updated, session: updated });
   } catch (err) {
     console.error('Update DTR error:', err);
     return res.status(500).json({ error: 'Unable to update DTR entry.' });

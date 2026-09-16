@@ -3,15 +3,15 @@ const TOKEN_KEY = 'dtr_api_token';
 
 export function getApiBase() {
   const custom = localStorage.getItem(API_BASE_KEY);
-  if (custom && !custom.includes('dtrproj.onrender.com')) {
-    return custom;
-  }
+  if (custom) return custom.trim().replace(/\/$/, '');
+
+  // Unified same-origin deployment (Vercel fullstack & local dev server)
   return '/api';
 }
 
 export function setApiBase(url) {
   if (!url) localStorage.removeItem(API_BASE_KEY);
-  else localStorage.setItem(API_BASE_KEY, url);
+  else localStorage.setItem(API_BASE_KEY, url.trim().replace(/\/$/, ''));
 }
 
 function authHeaders() {
