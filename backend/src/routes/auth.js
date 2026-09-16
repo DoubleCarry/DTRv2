@@ -245,15 +245,15 @@ router.post('/login', async (req, res) => {
 // GET /api/auth/me
 router.get('/me', requireAuth, async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).lean();
+    const user = req.user;
     if (!user) return res.status(404).json({ error: 'User not found' });
 
-    let activeOjt = await OJTRequirement.findOne({ userId: user._id, status: 'ACTIVE' }).lean();
+    let activeOjt = await OJTRequirement.findOne({ userId: user._id, status: 'ACTIVE' }).lean().catch(() => null);
     if (!activeOjt) {
-      activeOjt = await OJTRequirement.findOne({ userId: user._id }).lean();
+      activeOjt = await OJTRequirement.findOne({ userId: user._id }).lean().catch(() => null);
     }
 
-    const allOjts = await OJTRequirement.find({ userId: user._id }).sort({ createdAt: -1 }).lean();
+    const allOjts = await OJTRequirement.find({ userId: user._id }).sort({ createdAt: -1 }).lean().catch(() => []);
 
     return res.json({
       user: toUserDTO(user, activeOjt),

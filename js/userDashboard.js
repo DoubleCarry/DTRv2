@@ -688,6 +688,7 @@ export function handleAddEntry() {
     workDate: date,
     timeIn: entry.timeIn,
     timeOut: entry.timeOut,
+    absent: Boolean(entry.absent),
     note: entry.note,
     source: 'manual',
     ojtRequirementId: _activeOjt?._id || _activeOjt?.id || undefined,
@@ -839,6 +840,7 @@ export function saveEditEntry() {
     workDate: sessions[idx].date,
     timeIn: sessions[idx].timeIn,
     timeOut: sessions[idx].timeOut,
+    absent: Boolean(sessions[idx].absent),
     note: sessions[idx].note,
   }).catch(() => {});
 

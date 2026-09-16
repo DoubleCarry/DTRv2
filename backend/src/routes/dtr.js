@@ -115,6 +115,45 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Future dates cannot be used for DTR entries.' });
     }
 
+    const isAbsent = Boolean(req.body.absent || req.body.isAbsent || cleanIn === '--' || cleanOut === '--');
+    const ojtId = await resolveOjtId(req.user._id, ojtRequirementId);
+
+    if (isAbsent) {
+      const created = await DTRRecord.create({
+        userId: req.user._id,
+        ojtRequirementId: ojtId,
+        workDate: cleanDate,
+        timeIn: '--',
+        timeOut: '--',
+        hours: 0,
+        regularHours: 0,
+        overtimeHours: 0,
+        lateMinutes: 0,
+        undertimeMinutes: 0,
+        absent: true,
+        note: String(note || 'Absent').trim(),
+        source: ['manual', 'import', 'admin'].includes(source) ? source : 'manual',
+        createdBy: req.user._id,
+        updatedBy: req.user._id,
+        deletedAt: null,
+        deletedBy: null,
+      });
+
+      await AuditLog.create({
+        userId: req.user._id,
+        performedBy: req.user._id,
+        performedByRole: req.user.role,
+        action: 'CREATE_DTR',
+        details: {
+          recordId: created._id,
+          workDate: cleanDate,
+          absent: true,
+        },
+      });
+
+      return res.status(201).json({ record: created, session: created });
+    }
+
     if (!cleanIn || !cleanOut || cleanIn === '--' || cleanOut === '--') {
       return res.status(400).json({ error: 'Both Time In and Time Out are required.' });
     }
@@ -122,8 +161,6 @@ router.post('/', async (req, res) => {
     if (!/^\d{1,2}:\d{2}$/.test(cleanIn) || !/^\d{1,2}:\d{2}$/.test(cleanOut)) {
       return res.status(400).json({ error: 'Time must be in valid HH:MM format.' });
     }
-
-    const ojtId = await resolveOjtId(req.user._id, ojtRequirementId);
 
     // Calculate durations using user's settings
     const userSettings = req.user.settings || {};
@@ -141,6 +178,7 @@ router.post('/', async (req, res) => {
       timeIn: cleanIn,
       timeOut: cleanOut,
       hours: calc.creditedHours,
+      absent: false,
       note: String(note || '').trim(),
       source: ['manual', 'import', 'admin'].includes(source) ? source : 'manual',
       createdBy: req.user._id,
@@ -324,6 +362,7 @@ router.put('/:id', async (req, res) => {
       timeOut,
       note,
       ojtRequirementId,
+      absent,
     } = req.body || {};
 
     const existing = await DTRRecord.findOne({
@@ -352,8 +391,20 @@ router.put('/:id', async (req, res) => {
 
     const newTimeIn = timeIn !== undefined ? String(timeIn).trim() : existing.timeIn;
     const newTimeOut = timeOut !== undefined ? String(timeOut).trim() : existing.timeOut;
+    const isAbsent = absent !== undefined
+      ? Boolean(absent)
+      : (newTimeIn === '--' || newTimeOut === '--');
 
-    if (timeIn !== undefined || timeOut !== undefined) {
+    if (isAbsent) {
+      update.absent = true;
+      update.timeIn = '--';
+      update.timeOut = '--';
+      update.hours = 0;
+      update.regularHours = 0;
+      update.overtimeHours = 0;
+      update.lateMinutes = 0;
+      update.undertimeMinutes = 0;
+    } else if (timeIn !== undefined || timeOut !== undefined || absent === false) {
       if (!newTimeIn || !newTimeOut || newTimeIn === '--' || newTimeOut === '--') {
         return res.status(400).json({ error: 'Both Time In and Time Out are required.' });
       }
@@ -361,6 +412,7 @@ router.put('/:id', async (req, res) => {
       if (rawDuration === 0) {
         return res.status(400).json({ error: 'Time In and Time Out cannot be identical.' });
       }
+      update.absent = false;
       update.timeIn = newTimeIn;
       update.timeOut = newTimeOut;
 

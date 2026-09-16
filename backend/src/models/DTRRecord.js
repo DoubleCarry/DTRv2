@@ -9,6 +9,7 @@ const DTRRecordSchema = new mongoose.Schema(
     timeIn: { type: String, required: true }, // "HH:MM"
     timeOut: { type: String, required: true }, // "HH:MM"
     hours: { type: Number, default: 0 },
+    absent: { type: Boolean, default: false },
     regularHours: { type: Number, default: 0 },
     overtimeHours: { type: Number, default: 0 },
     lateMinutes: { type: Number, default: 0 },

@@ -10,7 +10,11 @@
       "destination": "/api/index.js"
     },
     {
-      "source": "/(.*)",
+      "source": "/robots.txt",
+      "destination": "/robots.txt"
+    },
+    {
+      "source": "/((?!api/|css/|js/|robots\\.txt|favicon\\.ico).*)",
       "destination": "/index.html"
     }
   ]

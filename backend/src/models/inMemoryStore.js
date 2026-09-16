@@ -553,6 +553,7 @@ export const InMemoryDTRRecord = {
         let match = true;
         if (query._id && String(r._id) !== String(query._id)) match = false;
         if (query.userId && String(r.userId) !== String(query.userId)) match = false;
+        if (query.workDate && r.workDate !== query.workDate) match = false;
         if (query.deletedAt === null && r.deletedAt !== null) match = false;
         if (match) return makeDoc(r, inMemoryDTRs);
       }
@@ -578,6 +579,7 @@ export const InMemoryDTRRecord = {
         timeIn: String(data.timeIn || '--'),
         timeOut: String(data.timeOut || '--'),
         hours: Number(data.hours || 0),
+        absent: Boolean(data.absent || data.timeIn === '--' || data.timeOut === '--'),
         regularHours: Number(data.regularHours || 0),
         overtimeHours: Number(data.overtimeHours || 0),
         lateMinutes: Number(data.lateMinutes || 0),
@@ -609,6 +611,7 @@ export const InMemoryDTRRecord = {
           timeIn: String(data.timeIn || '--'),
           timeOut: String(data.timeOut || '--'),
           hours: Number(data.hours || 0),
+          absent: Boolean(data.absent || data.timeIn === '--' || data.timeOut === '--'),
           regularHours: Number(data.regularHours || 0),
           overtimeHours: Number(data.overtimeHours || 0),
           lateMinutes: Number(data.lateMinutes || 0),

@@ -7,6 +7,9 @@
   <meta name="description" content="Daily Time Record and attendance tracking system with overtime calculations, session history, and administrative tools.">
   <meta property="og:title" content="DTR — Daily Time Record">
   <meta property="og:description" content="Daily Time Record and attendance tracking system with overtime calculations, session history, and administrative tools.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/layout.css">
@@ -87,7 +90,7 @@
   </div>
 </div>
 
-<div id="appShell" class="hidden">
+<main id="appShell" class="hidden">
   <nav class="topbar">
     <div class="topbar-left">
       <div class="topbar-logo-icon">
@@ -208,20 +211,20 @@
             <div class="input-group">
               <label>Time In</label>
               <div class="time-picker">
-                <select id="entryInHour" class="select-field time-wheel"><option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option selected>08</option><option>09</option><option>10</option><option>11</option><option>12</option></select>
+                <select id="entryInHour" class="select-field time-wheel" aria-label="Time In Hour"><option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option selected>08</option><option>09</option><option>10</option><option>11</option><option>12</option></select>
                 <span class="time-sep">:</span>
-                <select id="entryInMinute" class="select-field time-wheel"></select>
-                <select id="entryInMeridiem" class="select-field time-wheel"><option selected>AM</option><option>PM</option></select>
+                <select id="entryInMinute" class="select-field time-wheel" aria-label="Time In Minute"></select>
+                <select id="entryInMeridiem" class="select-field time-wheel" aria-label="Time In Meridiem AM or PM"><option selected>AM</option><option>PM</option></select>
               </div>
               <input type="hidden" id="entryInTime">
             </div>
             <div class="input-group">
               <label>Time Out</label>
               <div class="time-picker">
-                <select id="entryOutHour" class="select-field time-wheel"><option>01</option><option>02</option><option>03</option><option>04</option><option selected>05</option><option>06</option><option>07</option><option>08</option><option>09</option><option>10</option><option>11</option><option>12</option></select>
+                <select id="entryOutHour" class="select-field time-wheel" aria-label="Time Out Hour"><option>01</option><option>02</option><option>03</option><option>04</option><option selected>05</option><option>06</option><option>07</option><option>08</option><option>09</option><option>10</option><option>11</option><option>12</option></select>
                 <span class="time-sep">:</span>
-                <select id="entryOutMinute" class="select-field time-wheel"></select>
-                <select id="entryOutMeridiem" class="select-field time-wheel"><option>AM</option><option selected>PM</option></select>
+                <select id="entryOutMinute" class="select-field time-wheel" aria-label="Time Out Minute"></select>
+                <select id="entryOutMeridiem" class="select-field time-wheel" aria-label="Time Out Meridiem AM or PM"><option>AM</option><option selected>PM</option></select>
               </div>
               <input type="hidden" id="entryOutTime">
             </div>
@@ -325,7 +328,7 @@
       </div>
     </div>
   </div>
-</div>
+</main>
 
 <div id="settingsModal" class="modal-overlay hidden">
   <div class="modal modal-wide">
@@ -354,19 +357,19 @@
         <div class="input-group">
           <label>Schedule Start</label>
           <div class="time-picker">
-            <select id="scheduleStartHour" class="select-field time-wheel"><option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option selected>08</option><option>09</option><option>10</option><option>11</option><option>12</option></select>
+            <select id="scheduleStartHour" class="select-field time-wheel" aria-label="Schedule Start Hour"><option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option selected>08</option><option>09</option><option>10</option><option>11</option><option>12</option></select>
             <span class="time-sep">:</span>
-            <select id="scheduleStartMinute" class="select-field time-wheel"></select>
-            <select id="scheduleStartMeridiem" class="select-field time-wheel"><option selected>AM</option><option>PM</option></select>
+            <select id="scheduleStartMinute" class="select-field time-wheel" aria-label="Schedule Start Minute"></select>
+            <select id="scheduleStartMeridiem" class="select-field time-wheel" aria-label="Schedule Start Meridiem AM or PM"><option selected>AM</option><option>PM</option></select>
           </div>
         </div>
         <div class="input-group">
           <label>Schedule End</label>
           <div class="time-picker">
-            <select id="scheduleEndHour" class="select-field time-wheel"><option>01</option><option>02</option><option>03</option><option>04</option><option selected>05</option><option>06</option><option>07</option><option>08</option><option>09</option><option>10</option><option>11</option><option>12</option></select>
+            <select id="scheduleEndHour" class="select-field time-wheel" aria-label="Schedule End Hour"><option>01</option><option>02</option><option>03</option><option>04</option><option selected>05</option><option>06</option><option>07</option><option>08</option><option>09</option><option>10</option><option>11</option><option>12</option></select>
             <span class="time-sep">:</span>
-            <select id="scheduleEndMinute" class="select-field time-wheel"></select>
-            <select id="scheduleEndMeridiem" class="select-field time-wheel"><option>AM</option><option selected>PM</option></select>
+            <select id="scheduleEndMinute" class="select-field time-wheel" aria-label="Schedule End Minute"></select>
+            <select id="scheduleEndMeridiem" class="select-field time-wheel" aria-label="Schedule End Meridiem AM or PM"><option>AM</option><option selected>PM</option></select>
           </div>
         </div>
       </div>
@@ -387,19 +390,19 @@
         <div class="input-group">
           <label>Lunch Start</label>
           <div class="time-picker">
-            <select id="lunchStartHour" class="select-field time-wheel"><option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option>08</option><option>09</option><option>10</option><option selected>11</option><option>12</option></select>
+            <select id="lunchStartHour" class="select-field time-wheel" aria-label="Lunch Start Hour"><option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option>08</option><option>09</option><option>10</option><option selected>11</option><option>12</option></select>
             <span class="time-sep">:</span>
-            <select id="lunchStartMinute" class="select-field time-wheel"></select>
-            <select id="lunchStartMeridiem" class="select-field time-wheel"><option selected>AM</option><option>PM</option></select>
+            <select id="lunchStartMinute" class="select-field time-wheel" aria-label="Lunch Start Minute"></select>
+            <select id="lunchStartMeridiem" class="select-field time-wheel" aria-label="Lunch Start Meridiem AM or PM"><option selected>AM</option><option>PM</option></select>
           </div>
         </div>
         <div class="input-group">
           <label>Lunch End</label>
           <div class="time-picker">
-            <select id="lunchEndHour" class="select-field time-wheel"><option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option>08</option><option>09</option><option>10</option><option>11</option><option selected>12</option></select>
+            <select id="lunchEndHour" class="select-field time-wheel" aria-label="Lunch End Hour"><option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option>08</option><option>09</option><option>10</option><option>11</option><option selected>12</option></select>
             <span class="time-sep">:</span>
-            <select id="lunchEndMinute" class="select-field time-wheel"></select>
-            <select id="lunchEndMeridiem" class="select-field time-wheel"><option>AM</option><option selected>PM</option></select>
+            <select id="lunchEndMinute" class="select-field time-wheel" aria-label="Lunch End Minute"></select>
+            <select id="lunchEndMeridiem" class="select-field time-wheel" aria-label="Lunch End Meridiem AM or PM"><option>AM</option><option selected>PM</option></select>
           </div>
         </div>
       </div>
@@ -430,7 +433,7 @@
       <div class="export-options">
         <div class="input-group">
           <label>Export Type</label>
-          <select id="exportTemplateType" class="select-field" onchange="window.dtr.updateExportTemplateUI()">
+          <select id="exportTemplateType" class="select-field" aria-label="Export Template Type" onchange="window.dtr.updateExportTemplateUI()">
             <option value="quick" selected>Quick Export (Default)</option>
             <option value="university">University / OJT Template</option>
             <option value="custom">Custom Template (Advanced)</option>
@@ -484,8 +487,8 @@
         <textarea id="importText" class="input-field import-textarea" placeholder="Examples:&#10;03/25/2026 8:00 AM - 5:00 PM&#10;Mar 26, 2026 | 08:30 | 17:45&#10;2026-03-27,In: 0900,Out: 1800&#10;&quot;1&quot;,&quot;Jan 06, 2026&quot;,&quot;8:00 AM&quot;,&quot;5:00 PM&quot;&#10;2026-03-28 absent"></textarea>
       </div>
       <div class="input-group" style="margin-top:0.4rem;">
-        <label>Duplicate Handling Strategy</label>
-        <select id="importDuplicateMode" class="select-field">
+        <label for="importDuplicateMode">Duplicate Handling Strategy</label>
+        <select id="importDuplicateMode" class="select-field" aria-label="Duplicate Handling Strategy">
           <option value="skip" selected>Skip duplicates (preserve existing records)</option>
           <option value="replace">Replace matching existing records</option>
           <option value="keep_both">Keep both (import everything)</option>
@@ -521,20 +524,20 @@
         <div class="input-group">
           <label>Time In</label>
           <div class="time-picker">
-            <select id="editInHour" class="select-field time-wheel"><option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option selected>08</option><option>09</option><option>10</option><option>11</option><option>12</option></select>
+            <select id="editInHour" class="select-field time-wheel" aria-label="Edit Time In Hour"><option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option selected>08</option><option>09</option><option>10</option><option>11</option><option>12</option></select>
             <span class="time-sep">:</span>
-            <select id="editInMinute" class="select-field time-wheel"></select>
-            <select id="editInMeridiem" class="select-field time-wheel"><option selected>AM</option><option>PM</option></select>
+            <select id="editInMinute" class="select-field time-wheel" aria-label="Edit Time In Minute"></select>
+            <select id="editInMeridiem" class="select-field time-wheel" aria-label="Edit Time In Meridiem AM or PM"><option selected>AM</option><option>PM</option></select>
           </div>
           <input type="hidden" id="editInTime">
         </div>
         <div class="input-group">
           <label>Time Out</label>
           <div class="time-picker">
-            <select id="editOutHour" class="select-field time-wheel"><option>01</option><option>02</option><option>03</option><option>04</option><option selected>05</option><option>06</option><option>07</option><option>08</option><option>09</option><option>10</option><option>11</option><option>12</option></select>
+            <select id="editOutHour" class="select-field time-wheel" aria-label="Edit Time Out Hour"><option>01</option><option>02</option><option>03</option><option>04</option><option selected>05</option><option>06</option><option>07</option><option>08</option><option>09</option><option>10</option><option>11</option><option>12</option></select>
             <span class="time-sep">:</span>
-            <select id="editOutMinute" class="select-field time-wheel"></select>
-            <select id="editOutMeridiem" class="select-field time-wheel"><option>AM</option><option selected>PM</option></select>
+            <select id="editOutMinute" class="select-field time-wheel" aria-label="Edit Time Out Minute"></select>
+            <select id="editOutMeridiem" class="select-field time-wheel" aria-label="Edit Time Out Meridiem AM or PM"><option>AM</option><option selected>PM</option></select>
           </div>
           <input type="hidden" id="editOutTime">
         </div>

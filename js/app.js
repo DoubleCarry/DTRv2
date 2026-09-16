@@ -76,14 +76,33 @@ window.openModal  = openModal;
 window.closeModal = closeModal;
 
 /* ─── SESSION RESTORE ─── */
-if (hasApiToken()) {
+const cachedUser = getCurrentUser();
+if (hasApiToken() && cachedUser) {
+  // Optimistic instant launch — no flicker or unexpected logout on refresh
+  launchApp(cachedUser);
+  apiMe().then(({ user }) => {
+    saveUser(user);
+    setCurrentUser(user);
+    setTopbarUser(user);
+  }).catch((err) => {
+    const msg = String(err?.message || '').toLowerCase();
+    if (msg.includes('401') || msg.includes('unauthorized') || msg.includes('invalid token')) {
+      setApiToken(null);
+      setCurrentUser(null);
+      showLogin();
+    }
+  });
+} else if (hasApiToken()) {
   apiMe().then(({ user }) => {
     saveUser(user);
     setCurrentUser(user);
     launchApp(user);
-  }).catch(() => {
-    setApiToken(null);
-    setCurrentUser(null);
+  }).catch((err) => {
+    const msg = String(err?.message || '').toLowerCase();
+    if (msg.includes('401') || msg.includes('unauthorized') || msg.includes('invalid token')) {
+      setApiToken(null);
+      setCurrentUser(null);
+    }
     showLogin();
   });
 } else {
