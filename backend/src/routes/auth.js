@@ -181,6 +181,14 @@ router.post('/signup', async (req, res) => {
   }
 });
 
+// GET /api/auth/login
+router.get('/login', (_req, res) => {
+  res.status(405).json({
+    error: 'Method Not Allowed',
+    message: 'The login endpoint only accepts POST requests with JSON { username, password }. Visit / in your browser to view the login interface.',
+  });
+});
+
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
   try {

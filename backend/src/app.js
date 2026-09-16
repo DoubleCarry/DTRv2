@@ -199,9 +199,14 @@ if (process.env.VERCEL !== '1') {
   });
 }
 
-// 404 handler for API endpoints
-app.use((_req, res) => {
-  res.status(404).json({ error: 'Endpoint not found' });
+// 404 handler for unmatched API routes
+app.use((req, res) => {
+  console.warn(`[404 Not Found] ${req.method} ${req.originalUrl || req.url}`);
+  res.status(404).json({
+    error: 'Endpoint not found',
+    method: req.method,
+    path: req.originalUrl || req.url,
+  });
 });
 
 // Database offline error middleware fallback & global error handler (MUST be last)
