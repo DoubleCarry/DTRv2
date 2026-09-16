@@ -176,28 +176,50 @@ app.use(['/api/dtr', '/dtr'], dtrRoutes);
 app.use(['/api/ojt', '/ojt'], ojtRoutes);
 app.use(['/api/holidays', '/holidays'], holidayRoutes);
 
-// In local Node development mode, serve static assets & SPA fallback
-if (process.env.VERCEL !== '1') {
-  const candidateDirs = [
-    process.cwd(),
-    path.resolve(__dirname, '../../'),
-  ];
+// Serve frontend static assets from candidate directories
+const candidateDirs = [
+  process.cwd(),
+  path.resolve(__dirname, '../../'),
+];
+for (const dir of candidateDirs) {
+  if (fs.existsSync(path.join(dir, 'index.html'))) {
+    app.use(express.static(dir));
+  }
+}
+
+// Root / and client-side page routing (serves index.html or API status fallback)
+app.get(['/', '/login', '/dashboard'], (_req, res) => {
   for (const dir of candidateDirs) {
-    if (fs.existsSync(path.join(dir, 'index.html'))) {
-      app.use(express.static(dir));
+    const p = path.join(dir, 'index.html');
+    if (fs.existsSync(p)) {
+      return res.sendFile(p);
     }
   }
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api') || req.path.startsWith('/auth') || req.path.startsWith('/health')) return next();
-    for (const dir of candidateDirs) {
-      const p = path.join(dir, 'index.html');
-      if (fs.existsSync(p)) {
-        return res.sendFile(p);
-      }
-    }
+  return res.json({ ok: true, service: 'dtr-backend', status: 'API is running' });
+});
+
+// SPA fallback for HTML requests
+app.get('*', (req, res, next) => {
+  if (
+    req.path.startsWith('/api') ||
+    req.path.startsWith('/auth') ||
+    req.path.startsWith('/health') ||
+    req.path.startsWith('/users') ||
+    req.path.startsWith('/sessions') ||
+    req.path.startsWith('/dtr') ||
+    req.path.startsWith('/ojt') ||
+    req.path.startsWith('/holidays')
+  ) {
     return next();
-  });
-}
+  }
+  for (const dir of candidateDirs) {
+    const p = path.join(dir, 'index.html');
+    if (fs.existsSync(p)) {
+      return res.sendFile(p);
+    }
+  }
+  return next();
+});
 
 // 404 handler for unmatched API routes
 app.use((req, res) => {
