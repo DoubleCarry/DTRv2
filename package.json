@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node --watch backend/src/server.js",
     "start": "node backend/src/server.js",
-    "lint": "node -c backend/src/server.js backend/src/app.js api/index.js js/*.js tests/calcEngine.test.js",
+    "lint": "node -c backend/src/server.js backend/src/app.js api/*.js js/*.js tests/calcEngine.test.js",
     "test": "node tests/calcEngine.test.js"
   },
   "dependencies": {

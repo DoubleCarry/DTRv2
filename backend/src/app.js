@@ -49,8 +49,11 @@ app.use(cors({
 
 app.use(express.json({ limit: '1mb' }));
 
-// Health check endpoint
-app.get('/api/health', (_req, res) => {
+// Health check & status endpoints
+app.get(['/api', '/api/'], (_req, res) => {
+  res.json({ ok: true, service: 'dtr-backend', status: 'API is running' });
+});
+app.get(['/api/health', '/health'], (_req, res) => {
   res.json({ ok: true, service: 'dtr-backend', timestamp: new Date().toISOString() });
 });
 
@@ -165,37 +168,40 @@ app.use(async (_req, _res, next) => {
   next();
 });
 
-// API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/users', usersRoutes);
-app.use('/api/sessions', sessionsRoutes);
-app.use('/api/dtr', dtrRoutes);
-app.use('/api/ojt', ojtRoutes);
-app.use('/api/holidays', holidayRoutes);
+// API Routes (supports both /api/path and rewritten /path)
+app.use(['/api/auth', '/auth'], authRoutes);
+app.use(['/api/users', '/users'], usersRoutes);
+app.use(['/api/sessions', '/sessions'], sessionsRoutes);
+app.use(['/api/dtr', '/dtr'], dtrRoutes);
+app.use(['/api/ojt', '/ojt'], ojtRoutes);
+app.use(['/api/holidays', '/holidays'], holidayRoutes);
 
-// Serve frontend static assets from candidate directories
-const candidateDirs = [
-  process.cwd(),
-  path.resolve(__dirname, '../../'),
-];
-
-for (const dir of candidateDirs) {
-  if (fs.existsSync(path.join(dir, 'index.html'))) {
-    app.use(express.static(dir));
-  }
-}
-
-// SPA fallback for non-API routes (safe with fs.existsSync)
-app.get('*', (req, res, next) => {
-  if (req.path.startsWith('/api')) return next();
-
+// In local Node development mode, serve static assets & SPA fallback
+if (process.env.VERCEL !== '1') {
+  const candidateDirs = [
+    process.cwd(),
+    path.resolve(__dirname, '../../'),
+  ];
   for (const dir of candidateDirs) {
-    const p = path.join(dir, 'index.html');
-    if (fs.existsSync(p)) {
-      return res.sendFile(p);
+    if (fs.existsSync(path.join(dir, 'index.html'))) {
+      app.use(express.static(dir));
     }
   }
-  return res.status(404).send('Not Found');
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/auth') || req.path.startsWith('/health')) return next();
+    for (const dir of candidateDirs) {
+      const p = path.join(dir, 'index.html');
+      if (fs.existsSync(p)) {
+        return res.sendFile(p);
+      }
+    }
+    return next();
+  });
+}
+
+// 404 handler for API endpoints
+app.use((_req, res) => {
+  res.status(404).json({ error: 'Endpoint not found' });
 });
 
 // Database offline error middleware fallback & global error handler (MUST be last)

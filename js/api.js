@@ -3,7 +3,22 @@ const TOKEN_KEY = 'dtr_api_token';
 
 export function getApiBase() {
   const custom = localStorage.getItem(API_BASE_KEY);
-  if (custom) return custom.trim().replace(/\/$/, '');
+  if (custom) {
+    const trimmed = custom.trim().replace(/\/$/, '');
+    // If it was pointed to deprecated Render backend, purge and use same-origin /api
+    if (trimmed.includes('onrender.com')) {
+      localStorage.removeItem(API_BASE_KEY);
+    } else {
+      return trimmed;
+    }
+  }
+
+  // Safe check for Vite environment variable VITE_API_BASE
+  try {
+    if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) {
+      return import.meta.env.VITE_API_BASE.trim().replace(/\/$/, '');
+    }
+  } catch (_) {}
 
   // Unified same-origin deployment (Vercel fullstack & local dev server)
   return '/api';
